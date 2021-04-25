@@ -11,8 +11,8 @@ csv_file = ""
 @app.route("/", methods=['GET', 'POST'])
 @app.route("/main", methods=['GET', 'POST'])
 def home():
+    global csv_file
     if request.method == 'POST':
-        global csv_file
         csv_file = request.form.get('people_csv')
         print(csv_file)
         num_groups = request.form.get('num_groups')
@@ -20,7 +20,6 @@ def home():
         return redirect(url_for('calc_groups', num_groups=num_groups))
     global GROUPS
     global GRAPH
-    global csv_file
     GROUPS = {}
     GRAPH = ""
     csv_file = ""
