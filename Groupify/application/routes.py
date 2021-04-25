@@ -1,7 +1,6 @@
 from flask import send_from_directory, redirect, url_for, render_template, request
 from .make_groups import compute_groups, generate_graphs
 
-import fileinput
 from application import app
 
 GROUPS = {}
