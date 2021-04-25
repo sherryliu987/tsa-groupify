@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Groupify</title>
+    <link rel="icon" href="../static/favicon.ico"/>
+    <link rel="stylesheet" href="../static/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        .letter{
+            font-size: 50px;
+            text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+        }
+        img{
+            position:absolute;
+            width:150px;
+            top:0;
+            left:0;
+        }
+        form {
+            margin: 0 auto;
+            width:500px;
+            text-align:center;
+        }
+        th, td {
+            padding: 15px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        #input{
+            margin:auto;
+            width:75%;
+        }
+        #instructions{
+            text-align:left;
+            width:75%;
+            margin:auto;
+        }
+        #name_error, #race_error, #gender_error, #age_error, #exp_error, #group_error{
+            color:red;
+        }
+        #scrollable{
+            width:100%;
+            max-height:400px;
+            overflow:scroll;
+        }
+        #scrollable::-webkit-scrollbar {
+            display: none;
+        }
+
+        #category_exp{
+            color:forestgreen;
+            font-weight:bold;
+        }
+
+        #submit_button{
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 10px 25px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        #submit_button[disabled=disabled], #submit_button:disabled {
+            background-color: red;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div id="center">
+
+    <img src="../static/images/logo.png"><br><br>
+    <p>
+        <span class="letter">W</span>
+        <span class="letter">e</span>
+        <span class="letter">l</span>
+        <span class="letter">c</span>
+        <span class="letter">o</span>
+        <span class="letter">m</span>
+        <span style="padding-right: 10px;" class="letter">e  </span>
+        <span class="letter">  t</span>
+        <span style="padding-right: 10px;" class="letter">o  </span>
+        <span class="letter"> G</span>
+        <span class="letter">r</span>
+        <span class="letter">o</span>
+        <span class="letter">u</span>
+        <span class="letter">p</span>
+        <span class="letter">i</span>
+        <span class="letter">f</span>
+        <span class="letter">y</span>
+    </p>
+<br>
+    <p>This is a tool to help you ensure your groups are split with <b>diversity and inclusion </b>in mind. Hover over
+        column headers for formatting instructions. The submit button will turn <b>green</b> when your entered data is
+            valid
+        .</p>
+    <div id="instructions">
+        <p id="category_exp"></p>
+    </div>
+
+
+    <div id="scrollable">
+        <table id="input">
+            <tr id="column_titles">
+                <th id="name_head">Name<br><span id="name_error"></span></th>
+                <th id="race_head">Race<br><span id="race_error"></span></th>
+                <th id="gender_head">Gender<br><span id="gender_error"></span></th>
+                <th id="age_head">Age<br><span id="age_error"></span></th>
+                <th id="exp_head">Experience<br><span id="exp_error"></span></th>
+            </tr>
+            <tr id="last">
+                <td><div contenteditable></div></td>
+                <td><div contenteditable></div></td>
+                <td><div contenteditable></div></td>
+                <td><div contenteditable></div></td>
+                <td><div contenteditable></div></td>
+            </tr>
+        </table>
+    </div>
+    <br><br>
+
+
+
+    <form action="{{url_for('home')}}" method="post" enctype=multipart/form-data>
+        <label for="num_groups">How many groups? </label>
+        <input style="width:50px" type="number" id="num_groups" value=1 name="num_groups" ><br>
+        <span id="group_error"></span>
+        <br>
+        <input type="hidden" id="people_csv" name="people_csv">
+        <input id="submit_button" type="submit" value="Submit" disabled>
+
+    </form>
+<br>
+    <button id="button_load" style="display:none">
+        <i class="fa fa-spinner fa-spin"></i> Loading
+    </button>
+</div>
+
+<a id="about" href={{url_for('about')}}>About Groupify</a>
+
+</body>
+
+<script>
+    function table_as_csv(separator = ',') {
+        // Select rows from table_id
+        const rows = $('#input tr').not("#last");
+        // Construct csv
+        const csv = [];
+        for (let i = 0; i < rows.length; i++) {
+            const row = [], cols = rows[i].querySelectorAll('td, th');
+            for (let j = 0; j < cols.length; j++) {
+                let data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, '').replace(/(\s\s)/gm, ' ');
+                data = data.replace(/"/g, '""');
+                row.push('"' + data + '"');
+            }
+            csv.push(row.join(separator));
+        }
+        return String(csv.join('\n'));
+    }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const letters = document.getElementsByClassName("letter");
+
+        console.log(letters)
+        for (let i = 0; i < 17; i++) {
+            letters[i].style.color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+        }
+    });
+</script>
+
+<script>
+    $("#name_head").hover(function(){
+        $("#category_exp").text("Name: Any unique name")
+    });
+
+    $("#race_head").hover(function(){
+        $("#category_exp").text("Race: White - WH, Black or African American - AA, American Indian or Alaska Native - AIAN, Asian - AS\n" +
+            "    , Native Hawaiian or Other Pacific Islander - NHPI")
+    });
+
+    $("#gender_head").hover(function(){
+        $("#category_exp").text("Gender: Male - M, Female - F, Non-binary/Other - O")
+    });
+
+    $("#age_head").hover(function(){
+        $("#category_exp").text("Age: Any positive number")
+    });
+
+    $("#exp_head").hover(function(){
+        $("#category_exp").text("Experience: Number 1 (least experience) - 5 (most experience)")
+    });
+
+    $("#submit_button").click(function(){
+        $("#button_load").show();
+    });
+
+</script>
+
+<script>
+
+    let touched_groups = false;
+    $("#num_groups").click(function(){
+        console.log("Touched groups!")
+        touched_groups = true;
+    });
+
+    $('body').on('focus', '[contenteditable]', function() {
+        const $this = $(this);
+        $this.data('before', $this.html());
+    }).on('blur keyup paste input', '[contenteditable]', function() {
+        const $this = $(this);
+        if ($this.data('before') !== $this.html()) {
+            $this.data('before', $this.html());
+            $this.trigger('change');
+        }
+    });
+
+    let submittable = true;
+    $("body").change(function(){
+        let names = []
+        const table = $("#input");
+        submittable = true;
+        let name_error = "";
+        let race_error = "";
+        let gender_error = "";
+        let age_error = "";
+        let experience_error = "";
+        let num_groups_error = "";
+        table.find('tr').each(function (i, el) {
+            if($(this).attr('id') !== "column_titles"){
+                const $tds = $(this).find('td'),
+                    name = $tds.eq(0).text(),
+                    race = $tds.eq(1).text(),
+                    gender = $tds.eq(2).text(),
+                    age = $tds.eq(3).text(),
+                    exp = $tds.eq(4).text();
+                names.push(name);
+                if(name === ""){
+                    submittable = false;
+                    name_error = "Missing name";
+                }
+                if(race === ""){
+                    submittable = false;
+                    race_error = "Missing race";
+                }else if(!(race === "AIAN" || race === "AS" || race === "AA" || race === "NHPI" | race === "WH")){
+                    submittable = false;
+                    race_error = "Race must be WH, AA, AIAN, AS, or NHPI";
+                }
+                if(gender === ""){
+                    submittable = false;
+                    gender_error = "Missing gender";
+                }else if(!(gender === "M" || gender === "F" || gender === "O")){
+                    submittable = false;
+                    gender_error = "Gender must be M, F, or O";
+                }
+                if(age === "") {
+                    submittable = false;
+                    age_error = "Missing age"
+                }else if( isNaN(parseFloat(age) )){
+                    submittable = false;
+                    age_error = "Age must be a number"
+                }else if(parseFloat(age) < 0){
+                    submittable = false;
+                    age_error = "No negative ages"
+                }
+
+                if(exp === "") {
+                    submittable = false;
+                    experience_error = "Missing experience"
+                }else if( isNaN(parseFloat(exp)) ){
+                    submittable = false;
+                    experience_error = "Experience must be a number"
+                }else if(parseFloat(exp) < 1 || parseFloat(exp) > 5){
+                    submittable = false;
+                    experience_error = "Experience must be between 1 and 5"
+                }
+            }
+        });
+
+        if(name_error == ""){
+            names.sort();
+            for(let i = 0 ; i<names.length - 1 ; i++){
+                if(names[i] === names[i+1]){
+                    submittable = false;
+                    name_error = "No duplicate names"
+                    break;
+                }
+            }
+        }
+
+
+
+        let last_empty = false;
+        const $tds = $("#last").find('td'),
+            name = $tds.eq(0).text(),
+            race = $tds.eq(1).text(),
+            gender = $tds.eq(2).text(),
+            age = $tds.eq(3).text(),
+            exp = $tds.eq(4).text();
+
+        if(name === "" && race === "" && gender === "" && age === "" && exp === ""){
+            last_empty= true;
+            submittable = true;
+            //bug: it might not be submittable bc user changed a previous value
+        }
+
+        let num_rows = $("#input tr").length
+        if(num_rows <= 2 && last_empty){
+            submittable = false;
+        }
+
+        let num_groups = document.getElementById("num_groups").value
+        let num_people = last_empty ? num_rows - 2 : num_rows - 1;
+        // console.log(num_groups)
+        if(parseInt(num_groups) <= 0 || parseInt(num_groups) > num_rows - 1 || (parseInt(num_groups) >= num_rows - 1
+            && last_empty)){
+            submittable = false;
+            num_groups_error = "Group size must be between 1 and the number of people - " + num_people;
+        }else if(num_people % parseInt(num_groups) !== 0){
+            submittable = false;
+            num_groups_error = "Make sure the total number of people is divisible by your group size."
+        }else{
+            num_groups_error = "";
+        }
+
+        if(submittable && !last_empty){
+            $('#last').removeAttr('id');
+            $('#input').append('<tr id="last">\n' +
+                '            <td><div contenteditable></div></td>\n' +
+                '            <td><div contenteditable></div></td>\n' +
+                '            <td><div contenteditable></div></td>\n' +
+                '            <td><div contenteditable></div></td>\n' +
+                '            <td><div contenteditable></div></td>\n' +
+                '        </tr>');
+        }
+
+        if(submittable){
+            $("#submit_button").prop('disabled', false);
+            $("#name_error").text("");
+            $("#race_error").text("");
+            $("#gender_error").text("");
+            $("#age_error").text("");
+            $("#exp_error").text("");
+            $("#group_error").text("");
+            $("#people_csv").val(table_as_csv());
+        }else{
+            if(!last_empty){
+                $("#name_error").text(name_error);
+                $("#race_error").text(race_error);
+                $("#gender_error").text(gender_error);
+                $("#age_error").text(age_error);
+                $("#exp_error").text(experience_error);
+            }
+            $("#submit_button").prop('disabled', true);
+            if(touched_groups){
+                $("#group_error").text(num_groups_error);
+            }
+
+        }
+    })
+
+</script>
+
+</html>

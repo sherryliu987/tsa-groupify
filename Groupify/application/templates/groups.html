@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Groups</title>
+    <link rel="icon" href="../static/favicon.ico"/>
+    <link rel="stylesheet" href=../static/css/groups.css>
+
+    <style>
+        body{
+            text-align: center;
+        }
+        html {
+            background: url("../static/images/background-groups.png") no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Your groups have been chosen!</h1>
+{% for g in groups%}
+    <h3>Team {{g["id"]}}</h3>
+    {% for p in g["people"]%}
+        <p>{{p}} </p>
+    {% endfor %}
+{% endfor %}
+
+<a href={{url_for('graphs')}}><button>Summary Diversity Statistics</button></a>
+
+<a href={{url_for('home')}}><button>Back to form</button></a>
+
+</body>
+
+</html>
