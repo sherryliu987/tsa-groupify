@@ -31,9 +31,8 @@ def calc_groups(num_groups):
     global GROUPS
     GROUPS = compute_groups(csv_file, num_groups)
     global GRAPH
-    # GRAPH = generate_graphs()
+    GRAPH = generate_graphs()
     # print(GRAPH)
-    GRAPH = "HELLO"
     return redirect(url_for('groups'))
 
 @app.route("/graphs")
@@ -48,3 +47,4 @@ def groups():
 @app.route("/about")
 def about():
     return render_template("about.html")
+

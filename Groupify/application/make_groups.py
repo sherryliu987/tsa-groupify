@@ -140,20 +140,22 @@ def generate_graphs():
 
     fig, ((race, gender), (age, exp)) = plt.subplots(2, 2)
 
-    pie_plot(df, race, 'Race', ["AS", "AA", "WH", "AIAN", "NHPI"], ["Asian", "Black or African American", "White",
-                                                                    " American Indian or Alaska Native", "Native Hawaiian or Other Pacific Islander"])
+    race_labels = "Asian", "Black or African American", "White", " American Indian or Alaska Native", "Native Hawaiian or Other Pacific Islander"
+    race.pie(x=pie_plot(df, "Race", ["AS", "AA", "WH", "AIAN", "NHPI"]), labels=race_labels)
     race.set_title("Race")
-    pie_plot(df, gender, "Gender", ["M", "F", "O"], ["Male", "Female", "Nonbinary/Other"])
+    gender.pie(x=pie_plot(df, "Gender", ["M", "F", "O"]), labels=["Male", "Female", "Nonbinary/Other"])
     gender.set_title("Gender")
     age.boxplot(df["Age"])
     age.set_title("Age")
-    exp.boxplot(df["Experience"])
+    exp.hist(df["Experience"])
     exp.set_title("Experience")
 
     return fig_to_html(fig)
 
-def pie_plot(df, plot, var, possible, labels):
+
+def pie_plot(df, var, possible):
     areas = []
     for p in possible:
         areas = np.append(areas, sum(df[var] == p))
-    plot.pie(x=areas)
+    print(areas)
+    return areas
