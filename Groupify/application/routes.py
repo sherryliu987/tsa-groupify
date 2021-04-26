@@ -31,7 +31,7 @@ def calc_groups(num_groups):
     global GROUPS
     GROUPS = compute_groups(csv_file, num_groups)
     global GRAPH
-    GRAPH = generate_graphs()
+    # GRAPH = generate_graphs()
     # print(GRAPH)
     return redirect(url_for('groups'))
 
