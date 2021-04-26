@@ -82,27 +82,44 @@ def compute_groups(csv_string, num_groups):
     print(df)
 
     population_values = get_population_values(df)
+    for v in population_values[0]:
+        population_values = np.append(population_values, v)
+    population_values = np.delete(population_values, 0)
+
     groups_list = list(make_groups(df, int(num_groups)))
 
-    list(list(groups_list[0])[0])  # does this do anything?
+    new_groups_list = []
+    for group in groups_list:
+        new_groups_list.append(list(group))
+    groups_list = new_groups_list
+
+    # list(list(groups_list[0])[0])  # does this do anything?
+
+    print(groups_list)
+
     group_value_list = []
     for i in groups_list:
+        group_values = [0, 0, 0, 0, 0, 0, 0, 0]
         for x in i:
-            group_value_list.append(get_population_values(getGroupRows(list(x))))
+            group_values = get_population_values(getGroupRows(list(x)))
+            for v in group_values[0]:
+                group_values = np.append(group_values, v)
+            group_values = np.delete(group_values, 0)
+        group_value_list.append(group_values)
 
+    print(group_value_list)
+    print("POPULATION", population_values)
     best = float('inf')
     best_group = []
 
-    print("num possible: ", groups_list)
+    print("num possible: ", len(groups_list))
+    print("GROUP VALUE LIST")
+    print(group_value_list)
 
     for i in range(len(group_value_list)):
         the_sum = 0
-        for x in range(4):
-            if x == 0:
-                for y in range(5):
-                    the_sum += (abs(population_values[0][y] - group_value_list[i][x][y]))
-            else:
-                the_sum += abs(population_values[x] - group_value_list[i][x])
+        for x in range(8):
+            the_sum += (abs(population_values[x] - group_value_list[i][x]))
         print("sum: ", the_sum)
         if the_sum < best:
             print("found new best!")
